@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_dark">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/surface_dark"
+            app:titleTextColor="@color/text_primary"
+            app:title="@string/app_name" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gap="12dp">
+
+            <!-- Status Card -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardBackgroundColor="@color/surface_dark"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+                    <TextView
+                        android:id="@+id/tvStatusBadge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="○ ĐÃ DỪNG"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="13sp"
+                        android:letterSpacing="0.1"
+                        android:layout_marginBottom="8dp" />
+                    <TextView
+                        android:id="@+id/tvClickCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Số lần click: 0"
+                        android:textColor="@color/text_primary"
+                        android:textSize="28sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Mode Card -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardClickConfig"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardBackgroundColor="@color/surface_dark"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="CHẾ ĐỘ CLICK"
+                        android:textColor="@color/accent_blue"
+                        android:textSize="11sp"
+                        android:letterSpacing="0.15"
+                        android:layout_marginBottom="12dp" />
+
+                    <RadioGroup
+                        android:id="@+id/radioGroupMode"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <RadioButton
+                            android:id="@+id/radioFixed"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:text="⏱ Chế độ 1 — Delay cố định"
+                            android:textColor="@color/text_primary"
+                            android:textSize="15sp"
+                            android:button="@null"
+                            android:background="@drawable/radio_selector"
+                            android:paddingStart="16dp"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="8dp" />
+
+                        <RadioButton
+                            android:id="@+id/radioRandom"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:text="🎲 Chế độ 2 — Click ngẫu nhiên"
+                            android:textColor="@color/text_primary"
+                            android:textSize="15sp"
+                            android:button="@null"
+                            android:background="@drawable/radio_selector"
+                            android:paddingStart="16dp"
+                            android:gravity="center_vertical" />
+                    </RadioGroup>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/divider"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="12dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Độ trễ hiện tại"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="14sp" />
+                        <TextView
+                            android:id="@+id/tvDelayValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="1000 ms"
+                            android:textColor="@color/accent_blue"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Swipe mode card -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardSwipeConfig"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:visibility="gone"
+                app:cardBackgroundColor="@color/surface_dark"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="CHẾ ĐỘ VUỐT"
+                        android:textColor="@color/accent_orange"
+                        android:textSize="11sp"
+                        android:letterSpacing="0.15"
+                        android:layout_marginBottom="12dp" />
+                    <TextView
+                        android:id="@+id/tvSwipeCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0 điểm vuốt đã cài"
+                        android:textColor="@color/text_primary"
+                        android:textSize="16sp"
+                        android:layout_marginBottom="12dp" />
+                    <Button
+                        android:id="@+id/btnSwipeConfig"
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:text="⚙ Cấu hình điểm vuốt"
+                        android:backgroundTint="@color/accent_orange"
+                        android:textColor="@color/white"
+                        style="@style/Widget.MaterialComponents.Button" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Swipe toggle -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardBackgroundColor="@color/surface_dark"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="20dp"
+                    android:gravity="center_vertical">
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Chế độ Vuốt"
+                            android:textColor="@color/text_primary"
+                            android:textSize="16sp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Thay click bằng vuốt màn hình"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="13sp" />
+                    </LinearLayout>
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switchSwipeMode"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Action buttons -->
+            <Button
+                android:id="@+id/btnStartStop"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:text="▶ BẮT ĐẦU"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:backgroundTint="@color/start_green"
+                android:layout_marginBottom="8dp"
+                style="@style/Widget.MaterialComponents.Button" />
+
+            <Button
+                android:id="@+id/btnSettings"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:text="⚙ Cài đặt chi tiết"
+                android:textColor="@color/text_primary"
+                android:backgroundTint="@color/surface_light"
+                android:layout_marginBottom="32dp"
+                style="@style/Widget.MaterialComponents.Button" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

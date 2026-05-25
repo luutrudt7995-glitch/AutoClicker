@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@drawable/overlay_bg"
+    android:padding="8dp"
+    android:elevation="8dp">
+
+    <!-- Status label -->
+    <TextView
+        android:id="@+id/tvStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="■ OFF"
+        android:textColor="#FFFFFF"
+        android:textSize="11sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="4dp" />
+
+    <!-- Play/Stop button -->
+    <ImageButton
+        android:id="@+id/btnToggleClick"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        android:src="@drawable/ic_play"
+        android:background="@drawable/circle_button_bg"
+        android:scaleType="centerInside"
+        android:padding="12dp"
+        android:layout_marginBottom="4dp"
+        android:contentDescription="Start/Stop" />
+
+    <!-- Settings button -->
+    <ImageButton
+        android:id="@+id/btnSettings"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@drawable/ic_settings"
+        android:background="@drawable/circle_small_bg"
+        android:scaleType="centerInside"
+        android:padding="8dp"
+        android:contentDescription="Settings" />
+
+</LinearLayout>
