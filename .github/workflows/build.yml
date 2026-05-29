@@ -19,17 +19,17 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-
-      - name: Make gradlew executable & fix wrapper
+      - name: Fix gradle wrapper jar
         run: |
-          chmod +x gradlew
-          curl -L "https://services.gradle.org/distributions/gradle-8.2-bin.zip" -o gradle-bin.zip
-          unzip -q gradle-bin.zip
+          cd $RUNNER_TEMP
+          wget -q https://services.gradle.org/distributions/gradle-8.2-bin.zip
+          unzip -q gradle-8.2-bin.zip
+          cd $GITHUB_WORKSPACE
           mkdir -p gradle/wrapper
-          cp gradle-8.2/lib/plugins/gradle-wrapper-*.jar gradle/wrapper/gradle-wrapper.jar 2>/dev/null || \
-          find gradle-8.2 -name "gradle-wrapper.jar" -exec cp {} gradle/wrapper/gradle-wrapper.jar \;
+          find $RUNNER_TEMP/gradle-8.2 -name "gradle-wrapper.jar" | head -1 | xargs -I{} cp {} gradle/wrapper/gradle-wrapper.jar
+          chmod +x gradlew
+          echo "JAR copied:"
+          ls -lh gradle/wrapper/
 
       - name: Build Debug APK
         run: ./gradlew assembleDebug --no-daemon --stacktrace
