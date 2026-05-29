@@ -19,20 +19,22 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Fix gradle wrapper jar
+      - name: Install Gradle 8.2 directly
         run: |
-          cd $RUNNER_TEMP
-          wget -q https://services.gradle.org/distributions/gradle-8.2-bin.zip
-          unzip -q gradle-8.2-bin.zip
-          cd $GITHUB_WORKSPACE
-          mkdir -p gradle/wrapper
-          find $RUNNER_TEMP/gradle-8.2 -name "gradle-wrapper.jar" | head -1 | xargs -I{} cp {} gradle/wrapper/gradle-wrapper.jar
-          chmod +x gradlew
-          echo "JAR copied:"
-          ls -lh gradle/wrapper/
+          wget -q https://services.gradle.org/distributions/gradle-8.2-bin.zip -O /tmp/gradle.zip
+          unzip -q /tmp/gradle.zip -d /tmp/
+          sudo ln -sf /tmp/gradle-8.2/bin/gradle /usr/local/bin/gradle
+          gradle --version
 
       - name: Build Debug APK
-        run: ./gradlew assembleDebug --no-daemon --stacktrace
+        run: |
+          gradle assembleDebug \
+            --no-daemon \
+            --stacktrace \
+            -Dandroid.home=$ANDROID_SDK_ROOT
+        env:
+          ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+          ANDROID_HOME: /usr/local/lib/android/sdk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
