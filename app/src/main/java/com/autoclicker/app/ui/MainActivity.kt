@@ -15,23 +15,42 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.autoclicker.app.R
-import com.autoclicker.app.databinding.ActivityMainBinding
 import com.autoclicker.app.model.AppSettings
 import com.autoclicker.app.model.ClickMode
 import com.autoclicker.app.service.AutoClickAccessibilityService
 import com.autoclicker.app.service.OverlayService
 import com.autoclicker.app.utils.PreferenceManager
+import android.widget.Button
+import android.widget.RadioButton
+import android.widget.RadioGroup
+import android.widget.Switch
+import android.widget.TextView
+import androidx.cardview.widget.CardView
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding
     private lateinit var settings: AppSettings
     private var isRunning = false
+
+    // Views
+    private lateinit var tvStatusBadge: TextView
+    private lateinit var tvClickCount: TextView
+    private lateinit var tvDelayValue: TextView
+    private lateinit var tvSwipeCount: TextView
+    private lateinit var radioGroupMode: RadioGroup
+    private lateinit var radioFixed: RadioButton
+    private lateinit var radioRandom: RadioButton
+    private lateinit var switchSwipeMode: com.google.android.material.switchmaterial.SwitchMaterial
+    private lateinit var cardClickConfig: CardView
+    private lateinit var cardSwipeConfig: CardView
+    private lateinit var btnStartStop: Button
+    private lateinit var btnSettings: Button
+    private lateinit var btnSwipeConfig: Button
 
     private val statusReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val running = intent.getBooleanExtra(AutoClickAccessibilityService.EXTRA_IS_RUNNING, false)
-            val count   = intent.getLongExtra(AutoClickAccessibilityService.EXTRA_CLICK_COUNT, -1L)
+            val count = intent.getLongExtra(AutoClickAccessibilityService.EXTRA_CLICK_COUNT, -1L)
             isRunning = running
             updateRunningUI(running, count)
         }
@@ -39,13 +58,27 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        setSupportActionBar(binding.toolbar)
+        setContentView(R.layout.activity_main)
+
+        val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
+
+        // Init views
+        tvStatusBadge = findViewById(R.id.tvStatusBadge)
+        tvClickCount = findViewById(R.id.tvClickCount)
+        tvDelayValue = findViewById(R.id.tvDelayValue)
+        tvSwipeCount = findViewById(R.id.tvSwipeCount)
+        radioGroupMode = findViewById(R.id.radioGroupMode)
+        radioFixed = findViewById(R.id.radioFixed)
+        radioRandom = findViewById(R.id.radioRandom)
+        switchSwipeMode = findViewById(R.id.switchSwipeMode)
+        cardClickConfig = findViewById(R.id.cardClickConfig)
+        cardSwipeConfig = findViewById(R.id.cardSwipeConfig)
+        btnStartStop = findViewById(R.id.btnStartStop)
+        btnSettings = findViewById(R.id.btnSettings)
+        btnSwipeConfig = findViewById(R.id.btnSwipeConfig)
 
         settings = PreferenceManager.loadSettings(this)
-
-        setupUI()
         setupListeners()
         checkPermissions()
     }
@@ -65,34 +98,25 @@ class MainActivity : AppCompatActivity() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(statusReceiver)
     }
 
-    // ── Setup ────────────────────────────────────────────────────────────────
-    private fun setupUI() {
-        refreshSettingsDisplay()
-        updateRunningUI(false, -1)
-    }
-
     private fun setupListeners() {
-        // Mode toggle
-        binding.radioGroupMode.setOnCheckedChangeListener { _, checkedId ->
+        radioGroupMode.setOnCheckedChangeListener { _, checkedId ->
             val mode = when (checkedId) {
-                R.id.radioFixed  -> ClickMode.FIXED
+                R.id.radioFixed -> ClickMode.FIXED
                 R.id.radioRandom -> ClickMode.RANDOM
-                else             -> ClickMode.FIXED
+                else -> ClickMode.FIXED
             }
             settings = settings.copy(clickMode = mode)
             PreferenceManager.saveSettings(this, settings)
             refreshSettingsDisplay()
         }
 
-        // Toggle click/swipe mode
-        binding.switchSwipeMode.setOnCheckedChangeListener { _, checked ->
+        switchSwipeMode.setOnCheckedChangeListener { _, checked ->
             settings = settings.copy(isSwipeMode = checked)
             PreferenceManager.saveSettings(this, settings)
             refreshModePanel()
         }
 
-        // Start / Stop main button
-        binding.btnStartStop.setOnClickListener {
+        btnStartStop.setOnClickListener {
             if (!checkAccessibilityEnabled()) {
                 showAccessibilityDialog(); return@setOnClickListener
             }
@@ -100,73 +124,64 @@ class MainActivity : AppCompatActivity() {
                 requestOverlayPermission(); return@setOnClickListener
             }
             if (isRunning) {
-                stopService(); return@setOnClickListener
-            }
-            startOverlayService()
-            if (settings.isSwipeMode) {
-                sendAction(AutoClickAccessibilityService.ACTION_START_SWIPE)
+                stopService()
             } else {
-                sendAction(AutoClickAccessibilityService.ACTION_START_CLICK)
+                startOverlayService()
+                if (settings.isSwipeMode) {
+                    sendAction(AutoClickAccessibilityService.ACTION_START_SWIPE)
+                } else {
+                    sendAction(AutoClickAccessibilityService.ACTION_START_CLICK)
+                }
             }
         }
 
-        // Settings button
-        binding.btnSettings.setOnClickListener {
+        btnSettings.setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
         }
 
-        // Swipe config button
-        binding.btnSwipeConfig.setOnClickListener {
+        btnSwipeConfig.setOnClickListener {
             startActivity(Intent(this, SwipeConfigActivity::class.java))
         }
     }
 
     private fun refreshSettingsDisplay() {
         settings = PreferenceManager.loadSettings(this)
-
-        // Mode radio
         when (settings.clickMode) {
-            ClickMode.FIXED  -> binding.radioFixed.isChecked  = true
-            ClickMode.RANDOM -> binding.radioRandom.isChecked = true
+            ClickMode.FIXED -> radioFixed.isChecked = true
+            ClickMode.RANDOM -> radioRandom.isChecked = true
         }
-
-        // Delays
-        binding.tvDelayValue.text = when (settings.clickMode) {
-            ClickMode.FIXED  -> "${settings.fixedDelay} ms"
+        tvDelayValue.text = when (settings.clickMode) {
+            ClickMode.FIXED -> "${settings.fixedDelay} ms"
             ClickMode.RANDOM -> "${settings.randomDelayMin} – ${settings.randomDelayMax} ms"
         }
-
-        // Swipe mode
-        binding.switchSwipeMode.isChecked = settings.isSwipeMode
-        binding.tvSwipeCount.text = "${settings.swipePoints.size} điểm vuốt đã cài"
-
+        switchSwipeMode.isChecked = settings.isSwipeMode
+        tvSwipeCount.text = "${settings.swipePoints.size} điểm vuốt đã cài"
         refreshModePanel()
     }
 
     private fun refreshModePanel() {
         val isSwipe = settings.isSwipeMode
-        binding.cardClickConfig.visibility = if (isSwipe) android.view.View.GONE  else android.view.View.VISIBLE
-        binding.cardSwipeConfig.visibility = if (isSwipe) android.view.View.VISIBLE else android.view.View.GONE
+        cardClickConfig.visibility = if (isSwipe) android.view.View.GONE else android.view.View.VISIBLE
+        cardSwipeConfig.visibility = if (isSwipe) android.view.View.VISIBLE else android.view.View.GONE
     }
 
     private fun updateRunningUI(running: Boolean, count: Long) {
         isRunning = running
-        binding.btnStartStop.text = if (running) "⏹ DỪNG LẠI" else "▶ BẮT ĐẦU"
-        binding.btnStartStop.setBackgroundColor(
+        btnStartStop.text = if (running) "⏹ DỪNG LẠI" else "▶ BẮT ĐẦU"
+        btnStartStop.setBackgroundColor(
             getColor(if (running) R.color.stop_red else R.color.start_green)
         )
         if (count >= 0) {
-            binding.tvClickCount.text = "Số lần click: $count"
+            tvClickCount.text = "Số lần click: $count"
         } else if (!running) {
-            binding.tvClickCount.text = "Số lần click: 0"
+            tvClickCount.text = "Số lần click: 0"
         }
-        binding.tvStatusBadge.text = if (running) "● ĐANG CHẠY" else "○ ĐÃ DỪNG"
-        binding.tvStatusBadge.setTextColor(
+        tvStatusBadge.text = if (running) "● ĐANG CHẠY" else "○ ĐÃ DỪNG"
+        tvStatusBadge.setTextColor(
             getColor(if (running) R.color.start_green else R.color.text_secondary)
         )
     }
 
-    // ── Service control ──────────────────────────────────────────────────────
     private fun startOverlayService() {
         val intent = Intent(this, OverlayService::class.java)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -185,7 +200,6 @@ class MainActivity : AppCompatActivity() {
         LocalBroadcastManager.getInstance(this).sendBroadcast(Intent(action))
     }
 
-    // ── Permission checks ────────────────────────────────────────────────────
     private fun checkPermissions() {
         if (!checkOverlayPermission()) {
             AlertDialog.Builder(this)
@@ -204,16 +218,16 @@ class MainActivity : AppCompatActivity() {
         Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(this)
 
     private fun requestOverlayPermission() {
-        val intent = Intent(
-            Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-            Uri.parse("package:$packageName")
+        startActivity(
+            Intent(
+                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                Uri.parse("package:$packageName")
+            )
         )
-        startActivity(intent)
     }
 
     private fun checkAccessibilityEnabled(): Boolean {
-        return AutoClickAccessibilityService.isServiceRunning ||
-                isAccessibilityServiceEnabled()
+        return AutoClickAccessibilityService.isServiceRunning || isAccessibilityServiceEnabled()
     }
 
     private fun isAccessibilityServiceEnabled(): Boolean {
@@ -241,7 +255,6 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
-    // ── Menu ─────────────────────────────────────────────────────────────────
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
         return true
